@@ -61,13 +61,16 @@ size_t * c=vector_alloc(m);
 }
 return c;
 }
-int main(){
-	size_t **a=matrix_alloc(10,10);
-	size_t *b=vector_alloc(10);
-	print_matrix(a,10,10);
-	print_vector(b,10);
-	size_t* c=matvectmul(a,b,10,10);
-	print_vector(c,10);
+int main(int argc,char ** argv){
+	int m=atoi(argv[1]);
+	int n=atoi(argv[2]);
+	size_t **a=matrix_alloc(m,n);
+	size_t *b=vector_alloc(n);
+	//print_matrix(a,10,10);
+	//print_vector(b,10);
+	size_t* c=matvectmul(a,b,m,n);
+	//print_vector(c,10);
+	
 	vector_free((void*)b);
 	matrix_free((void **)a);
 	

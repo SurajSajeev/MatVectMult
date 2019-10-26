@@ -124,10 +124,10 @@ void work(size_t** inputMatrix, size_t* inputVector, int p,int numRow,int numCol
 
 //print_vector(oV,numRow);
 }
-int main(){
+int main(int argc,char ** argv){
 size_t numrows,numcols;
-numrows=20000;
-numcols=20000;
+numrows=atoi(argv[1]);
+numcols=atoi(argv[2]);
 size_t **a=matrix_alloc_for_p(numrows,numcols);
 
 
@@ -135,11 +135,8 @@ size_t *inputVector = vector_alloc(numcols);
 
      double t = 0.0;
         t -= omp_get_wtime();
-        work(a, inputVector,1,numrows ,numcols);
+        work(a, inputVector,4,numrows ,numcols);
         t += omp_get_wtime();
-        printf("PT for %d\tt:%lf\n",1, t);
+        printf("PT for %d\tt:%lf\n",4, t);
         t = 0.0;
-    
-
-
 }

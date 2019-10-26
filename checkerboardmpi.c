@@ -51,7 +51,9 @@ int *matrix_alloc_for_p(int r,int c){
 int len=0; 
     int *ptr, **arr; 
     int count = 0,i,j; 
-  
+    FILE *fptr;
+    fptr = fopen("matrix.txt","w");
+    
     len = sizeof(int *) * r + sizeof(int) * c * r; 
     arr = (int **)malloc(len*sizeof(int)); 
   
@@ -62,11 +64,13 @@ int len=0;
     for(i = 0; i < r; i++) 
         arr[i] = (ptr + c * i); 
   
-    for (i = 0; i < r; i++) 
-        for (j = 0; j < c; j++) 
+    for (i = 0; i < r; i++){ 
+        for (j = 0; j < c; j++) {
             arr[i][j] = count++; // OR *(*(arr+i)+j) = ++count 
-  
-    
+            fprintf(fptr,"%d ",arr[i][j]);
+        }
+        fprintf(fptr,"\n");
+}
     return (int*)(arr+c); 
 }
 
@@ -94,7 +98,12 @@ int *matvectmul(int *a,int *b,int m,int n){
 return b;
 }
 
-
+void writevector(char *filename,size_t * vector,int n){
+    FILE *fptr=fopen(filename,"w");
+    for(int i=0;i<n;i++)
+    fprintf(fptr,"%lu\n",vector[i]);
+    fclose(fptr);
+}
 int main(int argc,char **argv){
 MPI_Status status;
 MPI_Comm row_comm,col_comm;
@@ -106,7 +115,7 @@ int NoofRows,NoofCols,NoofRows_Bloc,NoofCols_Bloc;
 int Bloc_MatrixSize,Bloc_VectorSize,VectorSize;
 int Local_Index, Global_Row_Index, Global_Col_Index;
 int **Matrix ,*Matrix_Array,*Bloc_Matrix,*Vector,*Bloc_Vector;
-int *FinalResult, *MyResult,*FinalVector;
+size_t *FinalResult, *MyResult,*FinalVector;
 
 int *ranks,colsize,colrank,rowsize,rowrank,myrow;
 
@@ -122,8 +131,8 @@ if(Numproc!=(root_p*root_p))
 MPI_Finalize();
 exit(-1);
 }
-NoofRows=20;
-NoofCols=20;
+NoofRows=atoi(argv[1]);
+NoofCols=atoi(argv[2]);
 if(MyRank==0){
 if(NoofRows%root_p!=0 || NoofCols%root_p!=0){
     printf("The number of rows and columns sould be a multiple of root_p\n");
@@ -190,7 +199,7 @@ for(iproc = 0; iproc < root_p; iproc++){
 
   MPI_Bcast(Bloc_Vector, Bloc_VectorSize, MPI_INT, 0, col_comm);
 
-  MyResult   = (int*) malloc(NoofRows_Bloc * sizeof(int));
+  MyResult   = (size_t*) malloc(NoofRows_Bloc * sizeof(size_t));
   index = 0;
   for(irow=0; irow < NoofRows_Bloc; irow++){
       MyResult[irow]=0;
@@ -199,12 +208,12 @@ for(iproc = 0; iproc < root_p; iproc++){
       }
   }
     if(MyRank == Root) 
-      FinalResult = (int *)malloc(NoofRows_Bloc*Numproc*sizeof(int));
+      FinalResult = (size_t *)malloc(NoofRows_Bloc*Numproc*sizeof(size_t));
 
-   MPI_Gather (MyResult, NoofRows_Bloc, MPI_INT, FinalResult, 
-	       NoofRows_Bloc, MPI_INT, 0, MPI_COMM_WORLD); 
+   MPI_Gather (MyResult, NoofRows_Bloc, MPI_LONG, FinalResult, 
+	       NoofRows_Bloc, MPI_LONG, 0, MPI_COMM_WORLD); 
    if(MyRank == 0){
-      FinalVector = (int *) malloc(NoofRows * sizeof(int));
+      FinalVector = (size_t *) malloc(NoofRows * sizeof(size_t));
       index = 0;
       for(iproc=0; iproc<root_p; iproc++){
 	  for(irow=0; irow<NoofRows_Bloc; irow++){
@@ -215,7 +224,7 @@ for(iproc = 0; iproc < root_p; iproc++){
 				jproc*NoofRows_Bloc +irow];
 
 	      }
-              printf("%d ",FinalVector[index]);
+              printf("%lu ",FinalVector[index]);
 	      index++;
 	  }
       }

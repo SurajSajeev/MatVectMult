@@ -54,16 +54,17 @@ void work(size_t** inputMatrix, size_t* inputVector, int p){
             oV[r]=0;
             for(int c = 0; c < numCol; c++)
                 oV[r] += inputMatrix[r][c] * inputVector[c];
-                //printf("%d did [%d,%d]\n", id, r,c);
+               
         }
         
     }
 }
 
-int main(){
+int main(int argc,char ** argv){
     struct timespec begin, end;
     double t=0.0;
-    
+    numRow=atoi(argv[1]);
+    numCol=atoi(argv[2]);
     size_t **inputMatrix = matrix_alloc_for_p(numRow,numCol);
    
     

@@ -78,10 +78,11 @@ void work(size_t** inputMatrix, size_t* inputVector, int p){
     //print_vector(oV,numRow);
 }
 
-int main(){
+int main(int argc,char ** argv){
     struct timespec begin, end;
     double t=0.0;
-    
+    numRow=atoi(argv[1]);
+    numCol=atoi(argv[2]);
     size_t **inputMatrix = matrix_alloc_for_p(numRow,numCol);
    
     
